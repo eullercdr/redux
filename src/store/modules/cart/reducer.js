@@ -1,16 +1,19 @@
-/*
-Dentro do reducer, todos os reducers ouve todas as actions.
-
-Fazemos os cases para o reducer ouvir apenas a action que queremos.
-
-No momento que a alteração é feita, todos os componentes com connect são
-avisadas
-*/
+import produce from 'immer';
 
 export default function cart(state = [], action) {
   switch (action.type) {
     case 'ADD_TO_CART':
-      return [...state, action.product];
+      return produce(state, draft => {
+        const productIndex = draft.findIndex(p => p.id === action.product.id);
+        if (productIndex >= 0) {
+          draft[productIndex].amount += 1;
+        } else {
+          draft.push({
+            ...action.product,
+            amount: 1,
+          });
+        }
+      });
     default:
       return state;
   }
